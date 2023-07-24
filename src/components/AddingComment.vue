@@ -1,22 +1,62 @@
 <script setup>
 import Button from "@/components/Button.vue";
+import { useCommentsStore } from "@/stores/comments.js";
+import { useCurrentUserStore } from "@/stores/currentUser.js";
+import { ref } from "vue";
 
-defineProps({
-    currentUser: Object,
+const currentUserStore = useCurrentUserStore();
+const commentsStore = useCommentsStore();
+
+const props = defineProps({
     textareaContent: {
         type: String,
         default: "",
     },
-    buttonContent: String,
+    replyingTo: {
+        type: String,
+        default: null,
+    },
+    buttonContent: {
+        type: String,
+        default: "Send",
+    },
+    commentId: {
+        type: Number,
+        default: null,
+    },
 });
+
+let textarea = ref(null);
+
+function addComment() {
+    if (props.buttonContent == "Send") {
+        commentsStore.addComment(textarea.value.value);
+        textarea.value.value = "";
+    } else if (props.buttonContent == "Reply") {
+        let textareaArray = textarea.value.value.split(" ");
+        textareaArray.forEach((word, index) => {
+            if (word[0] === "@") textareaArray.splice(index, 1);
+        });
+        commentsStore.replyToComment(textareaArray.join(" "), props.replyingTo);
+    } else if (props.buttonContent === "Update") {
+        commentsStore.updateComment(props.commentId, textarea.value.value);
+    }
+}
 </script>
 
 <template>
     <div class="grid">
-        <img :src="currentUser?.image.png" :alt="currentUser?.username" />
-        <textarea placeholder="Add a comment..." :value="textareaContent">
+        <img
+            :src="currentUserStore.currentUser.image?.png"
+            :alt="currentUserStore.currentUser.username"
+        />
+        <textarea
+            placeholder="Add a comment..."
+            :value="textareaContent"
+            ref="textarea"
+        >
         </textarea>
-        <Button :content="buttonContent" />
+        <Button :content="buttonContent" @click="addComment" />
     </div>
 </template>
 
@@ -40,10 +80,20 @@ div.grid {
 .grid textarea {
     min-width: 100%;
     max-width: 525px;
-    height: 100px;
-    padding: 3px;
+    min-height: 100px;
+    padding: 5px;
     color: hsl(211, 10%, 45%);
+    border: 1px solid hsl(223, 19%, 93%);
+    border-radius: 5px;
     font: inherit;
-    resize: none;
+    resize: vertical;
+    transition: 0.2s border-color ease-in-out;
+}
+.grid textarea:hover {
+    border-color: hsl(238, 40%, 52%);
+}
+.grid textarea:focus-visible {
+    outline: none;
+    border: 2px solid hsl(238, 40%, 52%);
 }
 </style>

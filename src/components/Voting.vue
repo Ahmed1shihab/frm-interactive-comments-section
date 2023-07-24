@@ -1,35 +1,31 @@
 <script setup>
-let { score } = defineProps({
-    score: Number,
+import { useCommentsStore } from "@/stores/comments";
+
+defineProps({
+    commentId: Number,
 });
 
-function IncreaseScore() {
-    score++;
-}
-
-function DecreaseScore() {
-    score--;
-}
+const commentsStore = useCommentsStore();
 </script>
 
 <template>
-    <div>
+    <div class="voting-container">
         <img
             src="@/assets/images/icon-plus.svg"
             alt="plus-icon"
-            @click="IncreaseScore"
+            @click="commentsStore.increaseScore(commentId)"
         />
-        <span>{{ score }}</span>
+        <span>{{ commentsStore.getComment(commentId).score }}</span>
         <img
             src="@/assets/images/icon-minus.svg"
             alt="minus-icon"
-            @click="DecreaseScore"
+            @click="commentsStore.decreaseScore(commentId)"
         />
     </div>
 </template>
 
-<style scoped>
-div {
+<style>
+div.voting-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -39,17 +35,25 @@ div {
     padding: 13px;
     border-radius: 5px;
 }
-img {
+div.voting-container img {
     width: 15px;
     cursor: pointer;
 }
-img:hover {
+div.voting-container img:hover {
     filter: brightness(0) saturate(100%) invert(37%) sepia(9%) saturate(4487%)
         hue-rotate(202deg) brightness(91%) contrast(90%);
 }
-span {
+div.voting-container span {
     font-weight: 500;
     color: hsl(238, 40%, 52%);
     margin: 15px 0;
+}
+@media screen and (max-width: 600px) {
+    div.voting-container {
+        flex-direction: row;
+    }
+    div.voting-container span {
+        margin: 0 15px;
+    }
 }
 </style>
