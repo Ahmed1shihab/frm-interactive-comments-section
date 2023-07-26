@@ -1,34 +1,42 @@
 <script setup>
-import Comment from "@/components/Comment.vue";
 import AddingComment from "@/components/AddingComment.vue";
-import { onMounted, ref } from "vue";
+import Comment from "@/components/Comment.vue";
+import { useCommentsStore } from "@/stores/comments.js";
+import { useCurrentUserStore } from "@/stores/currentUser.js";
+import { onMounted } from "vue";
 
-let data = ref("");
+const commentsStore = useCommentsStore();
+const currentUserStore = useCurrentUserStore();
 
 onMounted(async () => {
-    data.value = await fetch("./src/data.json").then((response) =>
-        response.json()
+    await commentsStore.getComments();
+});
+
+commentsStore.$subscribe((mutation, state) => {
+    localStorage.setItem(
+        "data",
+        JSON.stringify({
+            currentUser: currentUserStore.currentUser,
+            comments: state.comments,
+        })
     );
 });
 </script>
 
 <template>
     <ul class="comments">
-        <li v-for="comment in data.comments" :key="comment.id">
-            <Comment :comment="comment" :currentUser="data.currentUser" />
+        <li v-for="comment in commentsStore.comments" :key="comment.id">
+            <Comment :comment="comment" />
             <div class="replies">
                 <ul v-show="comment.replies !== []">
-                    <li v-for="reply in comment.replies" :key="reply.id">
-                        <Comment
-                            :comment="reply"
-                            :currentUser="data.currentUser"
-                        />
+                    <li v-for="reply in comment?.replies" :key="reply.id">
+                        <Comment :comment="reply" />
                     </li>
                 </ul>
             </div>
         </li>
     </ul>
-    <AddingComment :currentUser="data.currentUser" />
+    <AddingComment />
 </template>
 
 <style>
@@ -37,7 +45,7 @@ onMounted(async () => {
 *::before {
     padding: 0;
     margin: 0;
-    scroll-behavior: smooth;
+    box-sizing: border-box;
 }
 :root {
     font-family: "Rubik", sans-serif;
@@ -46,6 +54,7 @@ onMounted(async () => {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
 }
 
 body {
@@ -55,6 +64,7 @@ body {
     justify-content: center;
     background-color: hsl(228, 33%, 97%);
     font-size: 16px;
+    overflow-x: hidden;
 }
 button {
     outline: none;
@@ -62,9 +72,13 @@ button {
     border: 1px solid transparent;
     font-family: inherit;
     cursor: pointer;
+    transition: 0.1s opacity ease-in-out;
+}
+button:hover {
+    opacity: 0.5;
 }
 ul.comments {
-    width: 700px;
+    max-width: 700px;
 }
 li {
     list-style: none;
@@ -74,7 +88,7 @@ div.replies {
     justify-content: flex-end;
 }
 div.replies ul {
-    width: 650px;
+    width: calc(100% - 10%);
     border-left: 1px solid hsl(239, 57%, 85%);
 }
 </style>

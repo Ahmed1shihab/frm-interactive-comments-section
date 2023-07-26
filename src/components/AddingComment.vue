@@ -73,9 +73,22 @@ div.grid {
     border-radius: 15px;
     padding: 15px;
     margin: 20px;
+    @media (max-width: 585px) {
+        grid-template-columns: none;
+        grid-template-rows: 1fr auto;
+        justify-content: normal;
+        column-gap: 0;
+        row-gap: 10px;
+        justify-items: right;
+    }
 }
 .grid img {
     max-width: 50px;
+    @media (max-width: 585px) {
+        width: 43px;
+        grid-area: 2;
+        justify-self: left;
+    }
 }
 .grid textarea {
     min-width: 100%;
@@ -88,6 +101,9 @@ div.grid {
     font: inherit;
     resize: vertical;
     transition: 0.2s border-color ease-in-out;
+    @media (max-width: 585px) {
+        grid-column: span 2;
+    }
 }
 .grid textarea:hover {
     border-color: hsl(238, 40%, 52%);
@@ -95,5 +111,10 @@ div.grid {
 .grid textarea:focus-visible {
     outline: none;
     border: 2px solid hsl(238, 40%, 52%);
+}
+@media (max-width: 585px) {
+    .grid button {
+        grid-area: 2;
+    }
 }
 </style>

@@ -34,10 +34,21 @@ div.voting-container {
     color: black;
     padding: 13px;
     border-radius: 5px;
+    grid-row-start: 1;
+    grid-row-end: span 2;
+    @media (max-width: 585px) {
+        flex-direction: row;
+        justify-self: start;
+        padding: 10px;
+        grid-area: 4;
+    }
 }
 div.voting-container img {
     width: 15px;
     cursor: pointer;
+    @media (max-width: 585px) {
+        width: 12px;
+    }
 }
 div.voting-container img:hover {
     filter: brightness(0) saturate(100%) invert(37%) sepia(9%) saturate(4487%)
@@ -47,13 +58,9 @@ div.voting-container span {
     font-weight: 500;
     color: hsl(238, 40%, 52%);
     margin: 15px 0;
-}
-@media screen and (max-width: 600px) {
-    div.voting-container {
-        flex-direction: row;
-    }
-    div.voting-container span {
+    @media (max-width: 585px) {
         margin: 0 15px;
+        font-size: 14px;
     }
 }
 </style>
